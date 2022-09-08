@@ -6,7 +6,7 @@ const encryptor = require('browser-passworder');
 const { normalize: normalizeAddress } = require('eth-sig-util');
 
 const SimpleKeyring = require('eth-simple-keyring');
-const HdKeyring = require('@metamask/eth-hd-keyring');
+const HdKeyring = require('eth-hd-keyring-qbck');
 
 const keyringTypes = [SimpleKeyring, HdKeyring];
 
@@ -79,6 +79,13 @@ class KeyringController extends EventEmitter {
    */
   async createNewVaultAndKeychain(password) {
     await this.createFirstKeyTree(password);
+    await this.persistAllKeyrings(password);
+    this.setUnlocked.bind();
+    this.fullUpdate();
+  }
+
+  async createNewVaultAndKeychainQBCK(password) {
+    await this.createFirstKeyTreeQBCK(password);
     await this.persistAllKeyrings(password);
     this.setUnlocked.bind();
     this.fullUpdate();
@@ -207,6 +214,26 @@ class KeyringController extends EventEmitter {
     const keyring = new Keyring(opts);
     if ((!opts || !opts.mnemonic) && type === KEYRINGS_TYPE_MAP.HD_KEYRING) {
       keyring.generateRandomMnemonic();
+      keyring.addAccounts();
+    }
+
+    const accounts = await keyring.getAccounts();
+    await this.checkForDuplicate(type, accounts);
+
+    this.keyrings.push(keyring);
+    await this.persistAllKeyrings();
+
+    await this._updateMemStoreKeyrings();
+    this.fullUpdate();
+
+    return keyring;
+  }
+
+  async addNewKeyringQBCK(type, opts) {
+    const Keyring = this.getKeyringClassForType(type);
+    const keyring = new Keyring(opts);
+    if ((!opts || !opts.mnemonic) && type === KEYRINGS_TYPE_MAP.HD_KEYRING) {
+      await keyring.generateRandomMnemonicQBCK();
       keyring.addAccounts();
     }
 
@@ -495,6 +522,21 @@ class KeyringController extends EventEmitter {
     this.clearKeyrings();
 
     const keyring = await this.addNewKeyring(KEYRINGS_TYPE_MAP.HD_KEYRING);
+    const [firstAccount] = await keyring.getAccounts();
+    if (!firstAccount) {
+      throw new Error('KeyringController - No account found on keychain.');
+    }
+
+    const hexAccount = normalizeAddress(firstAccount);
+    this.emit('newVault', hexAccount);
+    return null;
+  }
+
+  async createFirstKeyTreeQBCK(password) {
+    this.password = password;
+    this.clearKeyrings();
+
+    const keyring = await this.addNewKeyringQBCK(KEYRINGS_TYPE_MAP.HD_KEYRING);
     const [firstAccount] = await keyring.getAccounts();
     if (!firstAccount) {
       throw new Error('KeyringController - No account found on keychain.');
