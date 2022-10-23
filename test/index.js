@@ -109,6 +109,31 @@ describe('KeyringController', function () {
     });
   });
 
+  describe('createNewVaultAndKeychainQBCK', function () {
+    it('should set a vault on the configManager', async function () {
+      keyringController.store.updateState({ vault: null });
+      assert(!keyringController.store.getState().vault, 'no previous vault');
+
+      await keyringController.createNewVaultAndKeychainQBCK(password);
+      const { vault } = keyringController.store.getState();
+      // eslint-disable-next-line jest/no-restricted-matchers
+      expect(vault).toBeTruthy();
+    });
+
+    it('should encrypt keyrings with the correct password each time they are persisted', async function () {
+      keyringController.store.updateState({ vault: null });
+      assert(!keyringController.store.getState().vault, 'no previous vault');
+
+      await keyringController.createNewVaultAndKeychainQBCK(password);
+      const { vault } = keyringController.store.getState();
+      // eslint-disable-next-line jest/no-restricted-matchers
+      expect(vault).toBeTruthy();
+      keyringController.encryptor.encrypt.args.forEach(([actualPassword]) => {
+        expect(actualPassword).toBe(password);
+      });
+    });
+  });
+
   describe('createNewVaultAndRestore', function () {
     it('clears old keyrings and creates a one', async function () {
       const initialAccounts = await keyringController.getAccounts();

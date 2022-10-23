@@ -6,7 +6,7 @@ const encryptor = require('browser-passworder');
 const { normalize: normalizeAddress } = require('eth-sig-util');
 
 const SimpleKeyring = require('eth-simple-keyring');
-const HdKeyring = require('eth-hd-keyring-qbck');
+const HdKeyring = require('qbck-eth-hd-keyring');
 
 const keyringTypes = [SimpleKeyring, HdKeyring];
 

@@ -1,5 +1,5 @@
 {
-  "name": "eth-keyring-controller-qbck",
+  "name": "qbck-eth-keyring-controller",
   "version": "7.1.0",
   "description": "A module for managing various keyrings of Ethereum accounts, encrypting them, and using them.",
   "keywords": [
@@ -34,7 +34,7 @@
     "@metamask/bip39": "^4.0.0",
     "@metamask/eth-hd-keyring": "^4.0.2",
     "browser-passworder": "^2.0.3",
-    "eth-hd-keyring-qbck": "^4.1.0",
+    "qbck-eth-hd-keyring": "^4.1.0",
     "eth-sig-util": "^3.0.1",
     "eth-simple-keyring": "^4.2.0",
     "obs-store": "^4.0.3"
