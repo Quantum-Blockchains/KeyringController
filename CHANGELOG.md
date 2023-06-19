@@ -6,6 +6,49 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [11.0.0]
+### Changed
+- **BREAKING**: The addNewKeyring method now expects an object containing the property `privateKeys` of type `string[]` in case the supplied keyring is a "Simple Keyring". ([#202](https://github.com/MetaMask/KeyringController/pull/202)), ([#228](https://github.com/MetaMask/KeyringController/pull/228))
+- Migrate the project to TypeScript ([#202](https://github.com/MetaMask/KeyringController/pull/202))
+  - Methods that started with an underscore are now `#` private methods
+  - Additional validation has been added to most methods
+- deps: Unpin and bump @metamask/eth-sig-utils@5.0.2->^5.1.0 ([#224](https://github.com/MetaMask/KeyringController/pull/224))
+
+## [10.0.1]
+### Fixed
+- Save encryption salt when `persistAllKeyrings` yields a new encryption key ([#203](https://github.com/MetaMask/KeyringController/pull/203))
+
+## [10.0.0]
+### Changed
+- **BREAKING:** Update module name to use `@metamask` scope ([#187](https://github.com/MetaMask/KeyringController/pull/187))
+  - Consumers will now need to import this package as `@metamask/eth-keyring-controller`
+- **BREAKING:**  @metamask/eth-hd-keyring to v6.0.0 ([#193](https://github.com/MetaMask/KeyringController/pull/193))
+  - Reverts the serialization format of mnemonics on HDKeyrings from `Uint8Arrays` back to an untyped array of UTF8 encoded bytes, which was the format prior to v9.0.0 of this package.
+
+## [9.0.0] [DEPRECATED]
+### Added
+- Add support for keyring `init` method ([#163](https://github.com/MetaMask/KeyringController/pull/163)).
+  - If a keyring has an `init` method, it will be called automatically upon construction. It is called with `await`, so it can be asynchronous.
+
+### Changed
+- **BREAKING:** Replace constructor option and public property `keyringTypes` with `keyringBuilders` ([#163](https://github.com/MetaMask/KeyringController/pull/163)).
+  - The constructor now takes keyring builder functions rather than classes. Each builder function should return a keyring instance when called, and it must have a `type` string property set to the keyring type name. See the newly exported `keyringBuilderFactory` function for an example. The builder functions must be synchronous; use an `init` method for asynchronous initialization steps.
+- **BREAKING:** `KeyringController` is now a named export instead of a default export ([#163](https://github.com/MetaMask/KeyringController/pull/163)).
+- **BREAKING:** Update `@metamask/eth-simple-keyring` from v4 to v5 ([#171](https://github.com/MetaMask/KeyringController/pull/171)).
+  - This keyring type is included as a default. If you are using this keyring API directly, see [the `@metamask/eth-simple-keyring` release notes](https://github.com/MetaMask/eth-simple-keyring/releases/tag/v5.0.0) for details on required changes.
+- **BREAKING:** Replace `getKeyringClassForType` method with `getKeyringBuilderForType` ([#163](https://github.com/MetaMask/KeyringController/pull/163)).
+- **BREAKING:** Update `@metamask/eth-hd-keyring` to v5 ([#177](https://github.com/MetaMask/KeyringController/pull/177))
+  - This keyring type is included as a default. If you are using this keyring API directly, see [the `@metamask/eth-hd-keyring` release notes](https://github.com/MetaMask/eth-hd-keyring/releases/tag/v5.0.0) for details on required changes.
+- **BREAKING:** Require support for ES2020 ([#177](https://github.com/MetaMask/KeyringController/pull/177), [#180](https://github.com/MetaMask/KeyringController/pull/180))
+  - As a result of some dependency updates made in this release, this package now requires ES2020 support. If using this package in an environment that does not support ES2020 completely, consider investigating these two dependency changes and transpiling any packages using ES2020 syntax.
+- Update `@metamask/eth-sig-util` to v5 ([#180](https://github.com/MetaMask/KeyringController/pull/180))
+- Update minimum supported version of `@metamask/browser-passworder` from v4.0.1 to v4.0.2 ([#182](https://github.com/MetaMask/KeyringController/pull/182))
+- Remove `bip39` dependency ([#179](https://github.com/MetaMask/KeyringController/pull/179))
+
+### Fixed
+- Fix support for asynchronous `addAccounts` HD Keyring method ([#176](https://github.com/MetaMask/KeyringController/pull/176))
+  - This method was asynchronous, but was called synchronously. Currently the method does not do anything asychronous so this should have no functional impact, but this ensures any future errors or asynchronous steps added to that method work correctly in the future.
+
 ## [8.1.0]
 ### Changed
 - Allow deserializing vaults with unrecognized keyrings ([#169](https://github.com/MetaMask/KeyringController/pull/169))
@@ -63,7 +106,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Validate user imported seedphrase across all bip39 wordlists ([#77](https://github.com/MetaMask/KeyringController/pull/77))
 
 
-[Unreleased]: https://github.com/MetaMask/KeyringController/compare/v8.1.0...HEAD
+[Unreleased]: https://github.com/MetaMask/KeyringController/compare/v11.0.0...HEAD
+[11.0.0]: https://github.com/MetaMask/KeyringController/compare/v10.0.1...v11.0.0
+[10.0.1]: https://github.com/MetaMask/KeyringController/compare/v10.0.0...v10.0.1
+[10.0.0]: https://github.com/MetaMask/KeyringController/compare/v9.0.0...v10.0.0
+[9.0.0]: https://github.com/MetaMask/KeyringController/compare/v8.1.0...v9.0.0
 [8.1.0]: https://github.com/MetaMask/KeyringController/compare/v8.0.1...v8.1.0
 [8.0.1]: https://github.com/MetaMask/KeyringController/compare/v8.0.0...v8.0.1
 [8.0.0]: https://github.com/MetaMask/KeyringController/compare/v7.0.2...v8.0.0
